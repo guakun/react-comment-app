@@ -16,7 +16,7 @@ class CommentApp extends Component {
     this.state.comments.push(comment)
     if (!comment) return
     if (!comment.username) return alert('请输入用户名！')
-    if (!comment) return alert('请输入密码！')
+    if (!comment.content) return alert('请输入评论！')
     this.setState({
       comments: this.state.comments
     })
