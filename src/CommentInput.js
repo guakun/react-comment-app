@@ -1,7 +1,13 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { connect } from './react-redux'
+import ThemeSwitch from './ThemeSwitch'
 
 class CommentInput extends Component {
+  static contextTypes = {
+    store: PropTypes.object
+  }
+
   static propTypes = {
     onSubmit: PropTypes.func
   }
@@ -10,7 +16,8 @@ class CommentInput extends Component {
     super()
     this.state = {
       username: '',
-      content: ''
+      content: '',
+      themeColor: ''
     }
   }
 
@@ -52,8 +59,9 @@ class CommentInput extends Component {
   render () {
     return (
       <div className="comment-input">
+        <ThemeSwitch />
         <div className="comment-field">
-          <span className="comment-field-name">用户名:</span>
+          <span className="comment-field-name" style={{ color: this.props.themeColor }}>用户名:</span>
           <div className="comment-field-input">
             <input
               value={this.state.username}
@@ -73,5 +81,13 @@ class CommentInput extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    themeColor: state.themeColor
+  }
+}
+
+CommentInput = connect(mapStateToProps)(CommentInput)
 
 export default CommentInput

@@ -2,6 +2,10 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 class Comment extends Component {
+  static contextTypes = {
+    store: PropTypes.object
+  }
+
   static propTypes = {
     comment: PropTypes.object.isRequired
   }
@@ -9,17 +13,27 @@ class Comment extends Component {
   constructor () {
     super()
     this.state = {
-      timeString: ''
+      timeString: '',
+      themeColor: ''
     }
   }
 
   componentWillMount () {
     this._updateTimeString()
     this._timer = setInterval(this._updateTimeString.bind(this), 5000)
+    this._updateThemeColor()
+    const { store } = this.context
+    store.subscribe(() => this._updateThemeColor())
   }
 
   commentWillUnmount () {
     clearInterval(this._timer)
+  }
+
+  _updateThemeColor () {
+    const { store } = this.context
+    const state = store.getState()
+    this.setState({ themeColor: state.themeColor })
   }
 
   _getProcessContent (content) {
@@ -50,7 +64,7 @@ class Comment extends Component {
     return (
       <div className="comment">
         <div className="comment-username"> <span>{this.props.comment.username} </span>: </div>
-        <p dangerouslySetInnerHTML={{__html: this._getProcessContent(this.props.comment.content)}}></p>
+        <p  style={{ color: this.state.themeColor }} dangerouslySetInnerHTML={{__html: this._getProcessContent(this.props.comment.content)}}></p>
         <span className="comment-createdtime">{this.state.timeString}</span>
         <span className="comment-delete" onClick={this.onClickDelete.bind(this)}>删除</span>
       </div>

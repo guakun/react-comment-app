@@ -1,6 +1,35 @@
 import React, { Component } from 'react'
 import CommentInput from './CommentInput'
 import CommentList from './CommentList'
+// import PropTypes from 'prop-types'
+import { Provider } from './react-redux'
+
+function createStore (reducer) {
+  let state = null
+  const listeners = []
+  const subscribe = (listener) => listeners.push(listener)
+  const getState = () => state
+  const dispatch = (action) => {
+    state = reducer(state, action)
+    listeners.forEach((listener) => listener())
+  }
+  dispatch({}) // 初始化 state
+  return { getState, dispatch, subscribe }
+}
+
+const themeReducer = (state, action) => {
+  if (!state) return {
+    themeColor: '#13c1f1'
+  }
+  switch (action.type) {
+    case 'CHANGE_COLOR':
+      return { ...state, themeColor: action.themeColor }
+    default:
+      return state
+  }
+}
+
+const store = createStore(themeReducer)
 
 class CommentApp extends Component {
   constructor () {
@@ -34,7 +63,10 @@ class CommentApp extends Component {
   }
 
   onSubmit (comment) {
-    this.state.comments.push(comment)
+    // this.state.comments.push(comment)
+    this.state.comments.unshift(comment)
+    // const nextComments = this.state.comments.splice(0)
+    // nextComments.unshift(comment)
     if (!comment) return
     if (!comment.username) return alert('请输入用户名！')
     if (!comment.content) return alert('请输入评论！')
@@ -46,10 +78,12 @@ class CommentApp extends Component {
 
   render () {
     return (
-      <div className='wrapper'>
-        <CommentInput onSubmit={this.onSubmit.bind(this)} />
-        <CommentList comments={this.state.comments} onDeleteComment={this.onDeleteComment.bind(this)}/>
-      </div>
+      <Provider store={store}>
+        <div className='wrapper'>
+          <CommentInput onSubmit={this.onSubmit.bind(this)} />
+          <CommentList comments={this.state.comments} onDeleteComment={this.onDeleteComment.bind(this)}/>
+        </div>
+      </Provider>
     )
   }
 }
