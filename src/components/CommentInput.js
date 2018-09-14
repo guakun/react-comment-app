@@ -1,47 +1,31 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { connect } from './react-redux'
-import ThemeSwitch from './ThemeSwitch'
 
-class CommentInput extends Component {
-  static contextTypes = {
-    store: PropTypes.object
-  }
-
+export default class CommentInput extends Component {
   static propTypes = {
-    onSubmit: PropTypes.func
+    onSubmit: PropTypes.func,
+    onBlur: PropTypes.func,
+    username: PropTypes.any
   }
 
-  constructor () {
-    super()
+  static defaultProps = {
+    username: ''
+  }
+
+  constructor (props) {
+    super(props)
     this.state = {
-      username: '',
+      username: props.username,
       content: '',
-      themeColor: ''
     }
-  }
-
-  componentWillMount () {
-    this._loadUsername()
   }
 
   componentDidMount () {
     this.textarea.focus()
   }
 
-  _loadUsername () {
-    const username = localStorage.getItem('username')
-    if (username) {
-      this.setState({ username })
-    }
-  }
-
-  _saveUsername(username) {
-    localStorage.setItem('username', username)
-  }
-
   onUpdateUsername (event) {
-    this._saveUsername(event.target.value)
+    this.props.onBlur && this.props.onBlur(event.target.value)
   }
 
   onSubmit () {
@@ -59,7 +43,6 @@ class CommentInput extends Component {
   render () {
     return (
       <div className="comment-input">
-        <ThemeSwitch />
         <div className="comment-field">
           <span className="comment-field-name" style={{ color: this.props.themeColor }}>用户名:</span>
           <div className="comment-field-input">
@@ -81,13 +64,3 @@ class CommentInput extends Component {
     )
   }
 }
-
-const mapStateToProps = (state) => {
-  return {
-    themeColor: state.themeColor
-  }
-}
-
-CommentInput = connect(mapStateToProps)(CommentInput)
-
-export default CommentInput
